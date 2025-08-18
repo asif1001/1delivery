@@ -1,43 +1,96 @@
-# Fix GitHub Codespace npm Error
+# GitHub Codespaces Commands to Fix Deployment
 
-You got an npm cache error. Here's how to fix it:
+## Your secrets are set correctly! Now run these commands in GitHub Codespaces:
 
-## Step 1: Clean npm Cache
+### Step 1: Open GitHub Codespaces
+Go to: https://github.com/asif1001/delivery
+Click "Code" → "Codespaces" → "Create codespace on main"
+
+### Step 2: Run These Commands in Codespaces Terminal
+
+**Create the deployment workflow:**
 ```bash
-npm cache clean --force
+mkdir -p .github/workflows
+cat > .github/workflows/deploy.yml << 'EOF'
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [ main ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build
+      env:
+        VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+        VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+        VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+    - uses: actions/configure-pages@v4
+    - uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./dist
+    - uses: actions/deploy-pages@v4
+EOF
 ```
 
-## Step 2: Remove node_modules
+**Update vite.config.ts:**
 ```bash
-rm -rf node_modules package-lock.json
+cat > vite.config.ts << 'EOF'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/delivery/',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './client/src'),
+      '@shared': path.resolve(__dirname, './shared'),
+      '@assets': path.resolve(__dirname, './attached_assets'),
+    },
+  },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      input: './client/index.html'
+    }
+  }
+})
+EOF
 ```
 
-## Step 3: Fresh Install
+**Update package.json build script:**
 ```bash
-npm install
+npm pkg set scripts.build="vite build"
 ```
 
-## Step 4: Build and Deploy
+**Commit and push to trigger deployment:**
 ```bash
-npm run build
+git add .
+git commit -m "Setup GitHub Pages deployment with Firebase secrets"
+git push origin main
 ```
 
-## Step 5: Fix Build Output
-```bash
-cp -r dist/public/* dist/ && rm -rf dist/public
-```
+### Step 3: Enable GitHub Pages
+1. Go to: https://github.com/asif1001/delivery/settings/pages
+2. Under "Source", select "GitHub Actions"
+3. Save
 
-## Step 6: Deploy to GitHub Pages
-```bash
-npx gh-pages -d dist -m "Deploy OILDELIVERY v1.3.0"
-```
+### Step 4: Monitor Deployment
+1. Go to: https://github.com/asif1001/delivery/actions
+2. Watch the deployment progress
+3. Your app will be live at: https://asif1001.github.io/delivery/
 
-## Alternative: Use the Deploy Script
-```bash
-node deploy.js
-```
-
-## All Commands in Sequence (Copy & Paste):
-```bash
-npm cache clean --force && rm -rf node_modules package-lock.json && npm install && npm run build && cp -r dist/public/* dist/ && rm -rf dist/public && npx gh-pages -d dist -m "Deploy OILDELIVERY v1.3.0"
-```
+All your Firebase secrets are configured correctly. Just run these commands in Codespaces to complete the deployment!
