@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -12,7 +12,7 @@ import TaskManagement from "@/pages/task-management";
 import ComplaintManagement from "@/pages/complaint-management";
 import NotFound from "@/pages/not-found";
 
-function Router() {
+function AppRouter() {
   const { userData, isLoading } = useAuth();
 
   if (isLoading) {
@@ -57,7 +57,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <Router />
+        <WouterRouter base={import.meta.env.BASE_URL}>
+          <AppRouter />
+        </WouterRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );

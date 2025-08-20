@@ -129,7 +129,7 @@ export default function Login() {
         <div className="text-center mb-8">
           <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 shadow-xl p-2">
             <img 
-              src="/logo.png" 
+              src={new URL('/logo.png', import.meta.env.BASE_URL).toString()} 
               alt="OilDelivery Logo" 
               className="w-full h-full object-contain"
             />

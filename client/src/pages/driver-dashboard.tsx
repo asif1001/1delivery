@@ -239,7 +239,7 @@ export default function DriverDashboard({ user }: DriverDashboardProps) {
             <div className="flex items-center">
               <div className="bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center mr-3 shadow-lg p-1">
                 <img 
-                  src="/logo.png" 
+                  src={new URL('/logo.png', import.meta.env.BASE_URL).toString()} 
                   alt="OilDelivery Logo" 
                   className="w-full h-full object-contain"
                 />
