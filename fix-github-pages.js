@@ -12,11 +12,11 @@ const indexPath = path.join(__dirname, 'dist/index.html');
 if (fs.existsSync(indexPath)) {
   let content = fs.readFileSync(indexPath, 'utf8');
   
-  // Replace absolute paths with relative paths
-  content = content.replace(/href="\/assets\//g, 'href="./assets/');
-  content = content.replace(/src="\/assets\//g, 'src="./assets/');
-  content = content.replace(/href="\/icon-/g, 'href="./icon-');
-  content = content.replace(/href="\/apple-/g, 'href="./apple-');
+  // Replace absolute paths with relative paths (support with or without /1delivery/ prefix)
+  content = content.replace(/href="\/(?:1delivery\/)?assets\//g, 'href="./assets/');
+  content = content.replace(/src="\/(?:1delivery\/)?assets\//g, 'src="./assets/');
+  content = content.replace(/href="\/(?:1delivery\/)?icon-/g, 'href="./icon-');
+  content = content.replace(/href="\/(?:1delivery\/)?apple-/g, 'href="./apple-');
   
   fs.writeFileSync(indexPath, content);
   console.log('✅ Fixed index.html paths for GitHub Pages');
