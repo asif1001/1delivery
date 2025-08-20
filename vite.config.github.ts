@@ -5,7 +5,7 @@ import path from "path";
 // GitHub Pages specific configuration
 export default defineConfig({
   plugins: [react()],
-  base: '/delivery/',
+  base: '/1delivery/',
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
