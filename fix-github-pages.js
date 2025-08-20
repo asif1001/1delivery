@@ -22,19 +22,27 @@ if (fs.existsSync(indexPath)) {
   console.log('✅ Fixed index.html paths for GitHub Pages');
 }
 
-// Copy public assets to dist
-const publicDir = path.join(__dirname, 'client/public');
+// Copy public assets to dist from both client/public and root public
 const distDir = path.join(__dirname, 'dist');
 
-if (fs.existsSync(publicDir)) {
-  const files = fs.readdirSync(publicDir);
+function copyDirFiles(dirPath) {
+  if (!fs.existsSync(dirPath)) return false;
+  const files = fs.readdirSync(dirPath);
   files.forEach(file => {
     if (file !== '.nojekyll') {
-      const srcPath = path.join(publicDir, file);
+      const srcPath = path.join(dirPath, file);
       const destPath = path.join(distDir, file);
-      fs.copyFileSync(srcPath, destPath);
+      try {
+        fs.copyFileSync(srcPath, destPath);
+      } catch {}
     }
   });
+  return true;
+}
+
+const copiedClientPublic = copyDirFiles(path.join(__dirname, 'client/public'));
+const copiedRootPublic = copyDirFiles(path.join(__dirname, 'public'));
+if (copiedClientPublic || copiedRootPublic) {
   console.log('✅ Copied public assets to dist');
 }
 
